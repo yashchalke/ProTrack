@@ -31,4 +31,16 @@ def create_new_organization(payload:OrganizationFormBase,db:Session):
     db.refresh(org)
     db.refresh(member)
 
-    return {"organization": org, "member": member}
+    return {
+        "organization": org,
+        "member": member,
+        "message":"Organization Created Successfully"}
+
+
+def get_roles(db:Session):
+    roles = db.query(RoleDB).filter(RoleDB.is_global == True).all()
+    return {
+        "status":200,
+        "message":"Global Roles Fetched Successfully",
+        "roles":roles
+    }

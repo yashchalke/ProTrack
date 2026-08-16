@@ -1,7 +1,7 @@
 from fastapi import APIRouter,Depends,UploadFile,File,HTTPException
 from routers.Schemas import OrganizationFormBase
 from sqlalchemy.orm import Session
-from db.OrganizationDB import create_new_organization
+from db.OrganizationDB import create_new_organization,get_roles
 from db.db import get_db
 from utils.S3Client import s3_client,Bucket_name
 from uuid import uuid4
@@ -29,3 +29,7 @@ async def upload_logo(file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+@router.get("/global-roles")
+def get_global_roles(db:Session = Depends(get_db)):
+    return get_roles(db=db)

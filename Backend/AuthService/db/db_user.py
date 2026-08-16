@@ -32,6 +32,7 @@ def register_user(new_user:UserModel,db:Session):
 
 def login_user(user_request:LoginUserModel,db:Session):
     user = db.query(DBUser).filter(DBUser.email == user_request.email).first();
+    print(user)
     if not user:
         return {
             "status":401,
