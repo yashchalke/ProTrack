@@ -10,7 +10,7 @@ type SidebarOptionsProps = {
 
 const SidebarOptions = ({name,path}:SidebarOptionsProps) => {
     const pathname = usePathname();
-    const isActive = pathname === path;
+    const isActive = pathname === path || path !== "/" && pathname.startsWith(path);
 
   return (
     <Link href={path} className={`px-4 py-3 rounded-md cursor-pointer 
