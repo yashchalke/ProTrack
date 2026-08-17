@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from routers.Schemas import OrganizationFormBase
 from db.models import OrganizationDB,RoleDB,OrganizationMember
+from utils.dependency import get_current_user
 
-def create_new_organization(payload:OrganizationFormBase,db:Session):
+def create_new_organization(payload:OrganizationFormBase,db:Session,user_id:int):
     org = OrganizationDB(
         logo_url=payload.logo_url,
         name=payload.name,
@@ -22,7 +23,7 @@ def create_new_organization(payload:OrganizationFormBase,db:Session):
 
     member = OrganizationMember(
         organization_id = org.id,
-        user_id = 5,
+        user_id = user_id,
         role_id = role.id,
         job_title = role.name,
     )

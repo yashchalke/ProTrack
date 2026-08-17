@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const inputCls =
   "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white";
@@ -66,6 +67,7 @@ const Page = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [logoUploaded, setLogoUploaded] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
     const get_roles = async () => {
@@ -107,11 +109,12 @@ const Page = () => {
     setIsSubmitting(true);
     try {
       console.log(formData);
+      const token = localStorage.getItem("access_token")
       const response = await fetch(
         "http://localhost:8001/organization/create",
         {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json","Authorization":`Bearer ${token}`},
           body: JSON.stringify(formData),
         },
       );
@@ -121,6 +124,7 @@ const Page = () => {
       }
       const data = await response.json();
       toast.success(data.message);
+      router.push('/home')
     } catch (err) {
       console.log(err);
     } finally {
