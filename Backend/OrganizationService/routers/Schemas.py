@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from enum import Enum
 
 class OrganizationFormBase(BaseModel):
     logo_url:str
@@ -36,7 +37,7 @@ class DepartmentResponse(BaseModel):
     team_count:int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class DepartmentListResponse(BaseModel):
     departments:List[DepartmentResponse]
@@ -58,7 +59,7 @@ class RoleResponse(BaseModel):
     is_global:bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class RoleListResponse(BaseModel):
     roles : List[RoleResponse]
@@ -74,7 +75,27 @@ class TeamResponse(BaseModel):
     member_count:int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TeamListResponse(BaseModel):
     teams:List[TeamResponse]
+
+class InvitationStatus(str, Enum):
+    pending = "pending"
+    accepted = "accepted"
+    rejected = "rejected"
+
+class InvitationCreate(BaseModel):
+    email:str
+    organization_id:int
+    department_id:int
+
+class InvitationResponse(BaseModel):
+    id:int
+    email:str
+    organization_id:int
+    department_id:int
+    status:InvitationStatus
+
+    class Config:
+        from_attributes = True

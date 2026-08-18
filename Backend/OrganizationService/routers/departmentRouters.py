@@ -1,10 +1,13 @@
+import httpx
 from fastapi import APIRouter,Depends,HTTPException
 from sqlalchemy.orm import Session
 from db.db import get_db
-from db.models import OrganizationDB,DepartmentDB,RoleDB,TeamDB
-from Schemas import DepartmentCreate,DepartmentResponse,DepartmentListResponse,RoleResponse,RoleCreate,RoleListResponse,TeamResponse,TeamCreate,TeamListResponse
+from db.models import OrganizationDB,DepartmentDB,RoleDB,TeamDB,InvitationDB,OrganizationMember
+from routers.Schemas import DepartmentCreate,DepartmentResponse,DepartmentListResponse,RoleResponse,RoleCreate,RoleListResponse,TeamResponse,TeamCreate,TeamListResponse,InvitationCreate,InvitationResponse,InvitationStatus
 
 router = APIRouter(prefix="/department",tags=["Departments"])
+
+AUTH_SERVICE_URL = "http://localhost:8000"
 
 @router.post("/create")
 def create_new_department(payload:DepartmentCreate,db:Session = Depends(get_db)):
@@ -132,3 +135,53 @@ def get_teams_by_department(dept_id:int,db:Session = Depends(get_db)):
             member_count=len(teams.members)
         ))
     return {"teams":team_list}
+
+@router.post("/invite/new", response_model=InvitationResponse)
+def create_invitation(invite: InvitationCreate, db: Session = Depends(get_db)):
+    org = db.query(OrganizationDB).filter(OrganizationDB.id == invite.organization_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+
+    dept = db.query(DepartmentDB).filter(DepartmentDB.id == invite.department_id).first()
+    if not dept:
+        raise HTTPException(status_code=404, detail="Department not found")
+
+    new_invite = InvitationDB(
+        email=invite.email,
+        organization_id=invite.organization_id,
+        department_id=invite.department_id
+    )
+    db.add(new_invite)
+    db.commit()
+    db.refresh(new_invite)
+
+    # TODO: send email notification here
+    return new_invite
+
+@router.post("/invite/{invite_id}/accept")
+def accept_invitation(invite_id:int,db:Session = Depends(get_db)):
+    invitation = db.query(InvitationDB).filter(InvitationDB.id == invite_id).first()
+    if not invitation:
+        raise HTTPException(status_code=404,detail="Invitation not found or expired")
+
+    try:
+        response = httpx.get(f"{AUTH_SERVICE_URL}/getuser/{invitation.email}")
+        response.raise_for_status()
+        user = response.json()
+    except httpx.HTTPStatusError:
+        raise HTTPException(status_code=404, detail="User not found in AuthService")
+
+    invitation.status = InvitationStatus.accepted
+    db.commit()
+
+    new_member = OrganizationMember(
+        organization_id = invitation.organization_id,
+        department_id = invitation.department_id,
+        user_id = user["id"],
+        role_id = 1
+    )
+    db.add(new_member)
+    db.commit()
+    db.refresh(new_member)
+
+    return invitation

@@ -4,12 +4,13 @@ from db.db import engine,get_db
 from db import models
 from utils.SeedGlobalRoles import seed_global_roles
 from sqlalchemy.orm.session import Session
-from routers import organizationRouter
+from routers import organizationRouter,departmentRouters
 
 app = FastAPI()
 
 models.Base.metadata.create_all(engine)
 app.include_router(organizationRouter.router)
+app.include_router(departmentRouters.router)
 
 app.add_middleware(CORSMiddleware,
                    allow_credentials=True,

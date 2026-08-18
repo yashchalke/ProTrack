@@ -1,7 +1,8 @@
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean,Enum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from .db import Base
+import enum
 
 class OrganizationDB(Base):
     __tablename__ = "organizations"
@@ -80,3 +81,20 @@ class TeamDB(Base):
     # Relationships
     department = relationship("DepartmentDB", back_populates="teams")
     members = relationship("OrganizationMember", back_populates="team", cascade="all, delete-orphan")
+
+class InvitationStatus(str, enum.Enum):
+    pending = "pending"
+    accepted = "accepted"
+    rejected = "rejected"
+class InvitationDB(Base):
+    __tablename__ = "invitations"
+    id = Column(Integer,primary_key=True,index=True)
+    email = Column(String(255),nullable=False,index=True)
+    organization_id = Column(Integer,ForeignKey("organizations.id",ondelete="CASCADE"),nullable=False)
+    department_id = Column(Integer,ForeignKey("departments.id",ondelete="CASCADE"),nullable=False)
+    status = Column(Enum(InvitationStatus),default=InvitationStatus.pending)
+    created_at = Column(DateTime,server_default=func.now())
+
+    organization = relationship("OrganizationDB")
+    department = relationship("DepartmentDB")
+
