@@ -1,5 +1,6 @@
 import httpx
 from fastapi import APIRouter,Depends,HTTPException
+from utils.dependency import get_current_user
 from sqlalchemy.orm import Session
 from db.db import get_db
 from db.models import OrganizationDB,DepartmentDB,RoleDB,TeamDB,InvitationDB,OrganizationMember
@@ -37,7 +38,8 @@ def create_new_department(payload:DepartmentCreate,db:Session = Depends(get_db))
     }
 
 @router.get("/organization/{org_id}",response_model=DepartmentListResponse)
-def get_departments_by_org(org_id:int,db:Session = Depends(get_db)):
+def get_departments_by_org(org_id:int,db:Session = Depends(get_db),user_id:int = Depends(get_current_user)):
+    
     org = db.query(OrganizationDB).filter(OrganizationDB.id == org_id).first()
     if not org:
         raise HTTPException(status_code=404,detail="Organization not found")

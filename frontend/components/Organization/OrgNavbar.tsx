@@ -1,10 +1,12 @@
 "use client"
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { usePathname } from "next/navigation";
+import CreateDepartmentModal from "./Departments/CreateDepartmentModal";
 
 const OrgNavbar = () => {
   const pathname = usePathname();
+  const [isModalOpen,setIsModalOpen] = useState<boolean>(false)
 
   const tabs = [
     { name: "Overview", href: "/organization/overview" },
@@ -36,12 +38,17 @@ const OrgNavbar = () => {
       </div>
 
       <button
+        onClick={() => setIsModalOpen(true)}
         className={`bg-orange-500 hover:bg-orange-600 transition-colors px-4 py-2 rounded-lg text-white font-medium text-sm ${
           activeTab.href === "/organization/departments" ? "block" : "hidden"
         }`}
       >
         + Add New Department
       </button>
+
+      {isModalOpen && (
+        <CreateDepartmentModal onClose={() => setIsModalOpen(false)} />
+      )}
     </div>
   );
 };

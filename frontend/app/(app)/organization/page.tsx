@@ -1,17 +1,12 @@
+"use client"
 import React from 'react'
+import { redirect } from 'next/navigation'
 
-const page = () => {
+const Page = () => {
+redirect('/organization/overview')
   return (
-    <div className='p-5'>
-       
-        <div className='mt-8'>
-            <h1>Departments</h1>
-            <div>
-
-            </div>
-        </div>
-    </div>
+    <div>page</div>
   )
 }
 
-export default page
+export default Page
