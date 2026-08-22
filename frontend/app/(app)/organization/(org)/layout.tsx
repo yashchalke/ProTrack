@@ -2,6 +2,7 @@ import OrgNavbar from '@/components/Organization/OrgNavbar'
 import React from 'react'
 
 const Organizationlayout = ({children}:{children:React.ReactNode}) => {
+    
   return (
     <div className='p-6 w-full flex flex-col gap-4'>
         <div>

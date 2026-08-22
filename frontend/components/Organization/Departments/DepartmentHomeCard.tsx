@@ -1,7 +1,7 @@
 import { MoreVertical, Users, Network } from 'lucide-react'
 import React from 'react'
 
-const DepartmentHomeCard = ({ name = "Engineering", emp_count = 142, teams_count = 12 }) => {
+const DepartmentHomeCard = ({ name,emp_count,teams_count}:{name:string,emp_count:number,teams_count:number}) => {
   return (
     <div className="relative w-full max-w-md p-6 bg-gradient-to-br from-white via-orange-50/20 to-orange-100/30 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-y-6">
       <div className="flex justify-between items-center">
